@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quantum Calc - Trading</title>
+    <!-- Favicon & PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0e14">
+    <link rel="icon" type="image/png" href="public/favicon.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 4L4 28H28L16 4Z" stroke="url(#logo-grad)" stroke-width="2.5" stroke-linejoin="round" />
+                    <defs>
+                        <linearGradient id="logo-grad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#00f2ff" />
+                            <stop offset="1" stop-color="#7000ff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>QUANTUM CALC</span>
+            </div>
+            <div class="header-actions">
+                <button id="reset-btn" class="icon-btn" title="Reiniciar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Add Entry Card -->
+            <section class="card glass-card fade-in">
+                <div class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path></svg>
+                    <span>Nueva Entrada</span>
+                </div>
+                
+                <div class="form-group row">
+                    <div class="custom-select" id="custom-pair-select">
+                        <div class="select-trigger">
+                            <span id="selected-pair-text">BTCUSDT</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="select-options" id="pair-options-list">
+                            <!-- Options will be rendered here via JS -->
+                        </div>
+                        <button id="add-pair-btn" class="plus-btn" title="Agregar Par">+</button>
+                    </div>
+                </div>
+
+                <!-- Mode Toggle (Tabs) -->
+                <div class="mode-tabs">
+                    <button id="tab-buy" class="tab-btn active" data-mode="buy">COMPRA</button>
+                    <button id="tab-sell" class="tab-btn" data-mode="sell">VENTA</button>
+                </div>
+
+                <!-- Buy Mode Form -->
+                <div id="mode-buy-section" class="mode-section active">
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label>Precio Compra</label>
+                            <input type="number" id="input-price" placeholder="0.00" step="any" class="primary-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Monto (USDT)</label>
+                            <input type="number" id="input-amount" placeholder="0.00" step="any" class="primary-input">
+                        </div>
+                    </div>
+                    <button id="add-entry" class="action-btn primary">AÑADIR AL PORTAFOLIO</button>
+                </div>
+
+                <!-- Sell Mode Form (Simulator) -->
+                <div id="mode-sell-section" class="mode-section">
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label>Precio Venta</label>
+                            <input type="number" id="sell-price" placeholder="0.00" step="any" class="primary-input sell">
+                        </div>
+                        <div class="form-group">
+                            <label>Cant. a Vender</label>
+                            <input type="number" id="sell-qty" placeholder="0.00" step="any" class="primary-input">
+                        </div>
+                    </div>
+                    
+                    <div class="pnl-result-container">
+                        <div class="pnl-main">
+                            <span id="pnl-value">$0.00</span>
+                            <span id="pnl-percent">0.00%</span>
+                        </div>
+                        <div class="pnl-meta">PnL Proyectado</div>
+                    </div>
+                    
+                    <button id="register-sale" class="action-btn secondary">REGISTRAR VENTA</button>
+                </div>
+            </section>
+
+            <!-- Stats (Always visible) -->
+            <section id="portfolio-stats" class="stats-grid">
+                <div class="card stat-card">
+                    <span class="stat-label">Total Invertido</span>
+                    <span id="stat-total-usdt" class="stat-value">0.00 <small>USDT</small></span>
+                </div>
+                <div class="card stat-card accent">
+                    <span class="stat-label">Precio Promedio</span>
+                    <span id="stat-avg-price" class="stat-value">0.00</span>
+                </div>
+            </section>
+
+            <!-- Entries List (Shared) -->
+            <section class="card glass-card list-card">
+                <div class="card-title">
+                    <span id="list-title">Entradas Registradas</span>
+                    <span id="entry-count" class="badge">0</span>
+                </div>
+                <div id="entries-list" class="entries-container">
+                    <div class="empty-state">No hay registros aún</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <div id="pair-modal" class="modal-overlay">
+            <div class="modal-content card">
+                <h3>Agregar Nuevo Par</h3>
+                <input type="text" id="new-pair-input" placeholder="Ej: DOTUSDT" class="primary-input">
+                <div class="modal-actions">
+                    <button id="cancel-pair" class="action-btn ghost">Cancelar</button>
+                    <button id="save-pair" class="action-btn primary">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <span>QUANTUM V1.0 - Trading Toolkit</span>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

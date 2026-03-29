@@ -1,0 +1,11 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Build/Deps
+node_modules/
+dist/
+build/
