@@ -225,6 +225,11 @@ select.primary-input option {
     display: none;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(20px);
+    scrollbar-width: none;
+}
+
+.select-options::-webkit-scrollbar {
+    display: none;
 }
 
 .custom-select.active .select-options {

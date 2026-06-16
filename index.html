@@ -38,6 +38,18 @@
         </header>
 
         <main class="container">
+            <!-- Global Stats -->
+            <section class="stats-grid fade-in">
+                <div class="card stat-card">
+                    <span class="stat-label">Capital Total</span>
+                    <span id="stat-global-invested" class="stat-value">0,00 <small>USDT</small></span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-label">PnL Total</span>
+                    <span id="stat-global-pnl" class="stat-value">0,00 <small>USDT</small></span>
+                </div>
+            </section>
+
             <!-- Add Entry Card -->
             <section class="card glass-card fade-in">
                 <div class="card-title">
@@ -72,7 +84,7 @@
                             <input type="number" id="input-price" placeholder="0.00" step="any" class="primary-input">
                         </div>
                         <div class="form-group">
-                            <label>Monto (USDT)</label>
+                            <label id="label-amount">Monto (USDT)</label>
                             <input type="number" id="input-amount" placeholder="0.00" step="any" class="primary-input">
                         </div>
                     </div>
@@ -145,6 +157,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
 </html>
