@@ -1,7 +1,11 @@
-// ── Supabase ────────────────────────────────────────────────
-const SUPABASE_URL = 'https://tityanjlsadvtuiehhpd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpdHlhbmpsc2FkdnR1aWVoaHBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NjIwMzYsImV4cCI6MjA5NzEzODAzNn0.MO25Uuyau8qPrVePUQRJyMBCOMwIAmyE0ulwDgE6qxg';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ── Google Apps Script ──────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMYdjDi48pZuVZiHbLfipuFU5Z0uW_lQnjn3DoOeKhTZnEyYAofxbEJpWzG7KT8egsiA/exec';
+
+async function gas(params) {
+    const url = GAS_URL + '?' + new URLSearchParams(params).toString();
+    const res = await fetch(url);
+    return res.json();
+}
 
 // ── State ───────────────────────────────────────────────────
 let state = {
@@ -64,19 +68,11 @@ const selectors = {
 
 // ── DB Layer ────────────────────────────────────────────────
 async function loadState() {
-    const [portfolioRes, salesRes, pairsRes] = await Promise.all([
-        db.from('portfolio').select('*').order('timestamp', { ascending: true }),
-        db.from('sales').select('*').order('timestamp', { ascending: true }),
-        db.from('custom_pairs').select('pair').order('created_at', { ascending: true })
-    ]);
-
-    if (portfolioRes.error || salesRes.error || pairsRes.error) {
-        throw new Error('Error al conectar con la base de datos.');
-    }
-
-    state.portfolio = portfolioRes.data || [];
-    state.sales = salesRes.data || [];
-    state.customPairs = (pairsRes.data || []).map(r => r.pair);
+    const data = await gas({ action: 'load' });
+    if (data.error) throw new Error(data.error);
+    state.portfolio = data.portfolio || [];
+    state.sales = data.sales || [];
+    state.customPairs = data.customPairs || [];
 }
 
 // ── Init ────────────────────────────────────────────────────
@@ -283,10 +279,10 @@ function registerEvents() {
         };
 
         selectors.addEntryBtn.disabled = true;
-        const { error } = await db.from('portfolio').insert(entry);
+        const res = await gas({ action: 'insert', table: 'portfolio', row: JSON.stringify(entry) });
         selectors.addEntryBtn.disabled = false;
 
-        if (error) { alert('Error al guardar. Intentá de nuevo.'); return; }
+        if (res.error) { alert('Error al guardar. Intentá de nuevo.'); return; }
 
         state.portfolio.push(entry);
         renderEntries();
@@ -304,13 +300,13 @@ function registerEvents() {
         e.target.disabled = true;
 
         if (type === 'sale') {
-            const { error } = await db.from('sales').delete().eq('id', id);
-            if (error) { e.target.disabled = false; alert('Error al eliminar.'); return; }
-            state.sales = state.sales.filter(item => item.id !== id);
+            const res = await gas({ action: 'delete', table: 'sales', id });
+            if (res.error) { e.target.disabled = false; alert('Error al eliminar.'); return; }
+            state.sales = state.sales.filter(item => String(item.id) !== String(id));
         } else {
-            const { error } = await db.from('portfolio').delete().eq('id', id);
-            if (error) { e.target.disabled = false; alert('Error al eliminar.'); return; }
-            state.portfolio = state.portfolio.filter(item => item.id !== id);
+            const res = await gas({ action: 'delete', table: 'portfolio', id });
+            if (res.error) { e.target.disabled = false; alert('Error al eliminar.'); return; }
+            state.portfolio = state.portfolio.filter(item => String(item.id) !== String(id));
         }
 
         renderEntries();
@@ -355,10 +351,10 @@ function registerEvents() {
         };
 
         selectors.registerSaleBtn.disabled = true;
-        const { error } = await db.from('sales').insert(sale);
+        const res = await gas({ action: 'insert', table: 'sales', row: JSON.stringify(sale) });
         selectors.registerSaleBtn.disabled = false;
 
-        if (error) { alert('Error al registrar venta.'); return; }
+        if (res.error) { alert('Error al registrar venta.'); return; }
 
         state.sales.push(sale);
         renderEntries();
@@ -374,10 +370,7 @@ function registerEvents() {
         if (!confirm('¿Estás seguro de que querés borrar todos los datos (incluyendo ventas)?')) return;
 
         selectors.resetBtn.disabled = true;
-        await Promise.all([
-            db.from('portfolio').delete().gt('id', 0),
-            db.from('sales').delete().gt('id', 0)
-        ]);
+        await gas({ action: 'reset' });
         selectors.resetBtn.disabled = false;
 
         state.portfolio = [];
@@ -409,10 +402,10 @@ function registerEvents() {
         }
 
         selectors.savePairBtn.disabled = true;
-        const { error } = await db.from('custom_pairs').insert({ pair: newPair });
+        const res = await gas({ action: 'insert_pair', pair: newPair });
         selectors.savePairBtn.disabled = false;
 
-        if (!error) {
+        if (!res.error) {
             state.customPairs.push(newPair);
             renderOptions();
             updateSelectedPair(newPair);
