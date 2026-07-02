@@ -1,10 +1,24 @@
 // ── Google Apps Script ──────────────────────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwfO5yaLfzgV1z37rIYQ4pVNELCsVaOPGkyCMIGMwqmx1OvolbR2oK9BczBlAcmg6u2bA/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxmzY25FZDSu9Y4F1UJ-NEBl3s7LM4iVJOuDWlmYhIhI7WT4OSxe25vHDs03HFoybbOiA/exec';
 
-async function gas(params) {
-    const url = GAS_URL + '?' + new URLSearchParams(params).toString();
-    const res = await fetch(url);
-    return res.json();
+function gas(params) {
+    return new Promise((resolve, reject) => {
+        const cbName = 'gas_cb_' + Date.now();
+        const script = document.createElement('script');
+        params.callback = cbName;
+        script.src = GAS_URL + '?' + new URLSearchParams(params).toString();
+        window[cbName] = (data) => {
+            delete window[cbName];
+            document.body.removeChild(script);
+            resolve(data);
+        };
+        script.onerror = () => {
+            delete window[cbName];
+            document.body.removeChild(script);
+            reject(new Error('Error de conexión'));
+        };
+        document.body.appendChild(script);
+    });
 }
 
 // ── State ───────────────────────────────────────────────────
