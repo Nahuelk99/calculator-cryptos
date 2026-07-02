@@ -1,5 +1,5 @@
 // ── Google Apps Script ──────────────────────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMYdjDi48pZuVZiHbLfipuFU5Z0uW_lQnjn3DoOeKhTZnEyYAofxbEJpWzG7KT8egsiA/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwfO5yaLfzgV1z37rIYQ4pVNELCsVaOPGkyCMIGMwqmx1OvolbR2oK9BczBlAcmg6u2bA/exec';
 
 async function gas(params) {
     const url = GAS_URL + '?' + new URLSearchParams(params).toString();
