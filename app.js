@@ -16,7 +16,7 @@ let state = {
     activeMode: 'buy'
 };
 
-const DEFAULT_PAIRS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'AVAXUSDT', 'XRPUSDT', 'LTCUSDT', 'USDTARS'];
+const DEFAULT_PAIRS = [];
 
 function getQuoteCurrency(pair) {
     if (pair.endsWith('USDT')) return 'USDT';
@@ -73,6 +73,7 @@ async function loadState() {
     state.portfolio = data.portfolio || [];
     state.sales = data.sales || [];
     state.customPairs = data.customPairs || [];
+    if (state.customPairs.length > 0) state.selectedPair = state.customPairs[0];
 }
 
 // ── Init ────────────────────────────────────────────────────
